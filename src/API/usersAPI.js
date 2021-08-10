@@ -29,13 +29,7 @@ export const checkCredentials = async ({ login }) => {
       currentUser = users.find(
         (user) => user.email === login || user.username === login
       );
-      console.log("Current user");
-      console.log(currentUser);
     }
-
-    console.log(
-      isAuthorised ? "You are authorised" : "There is no such credential"
-    );
 
     return isAuthorised ? currentUser : null;
   } catch (error) {

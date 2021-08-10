@@ -1,4 +1,3 @@
-//import axios from "axios";
 import { checkCredentials } from "../../API/usersAPI";
 
 import {
@@ -14,26 +13,12 @@ export const login = (values) => async (dispatch) => {
       type: USER_LOGIN_REQUEST,
     });
 
-    // const config = {
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //   },
-    // };
-
-    // const { data } = await axios.post(
-    //   "/api/users/login",
-    //   { email, password },
-    //   config
-    // );
-
     const loggedInUser = await checkCredentials(values);
 
     dispatch({
       type: USER_LOGIN_SUCCESS,
       payload: loggedInUser,
     });
-
-    // localStorage.setItem("userInfo", JSON.stringify(data));
   } catch (error) {
     dispatch({
       type: USER_LOGIN_FAIL,
@@ -46,7 +31,6 @@ export const login = (values) => async (dispatch) => {
 };
 
 export const logout = () => (dispatch) => {
-  //localStorage.removeItem("iserInfo");
   dispatch({
     type: USER_LOGOUT,
   });

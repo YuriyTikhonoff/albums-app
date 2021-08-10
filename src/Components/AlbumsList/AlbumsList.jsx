@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux'
 import { useHistory } from 'react-router-dom';
-import axios from 'axios';
+import photosAPI from '../../API/photosAPI'
+import albumsAPI from '../../API/albumsAPI'
 import './AlbumsList.scss'
 
 const AlbumsList = () => {
     const { userInfo } = useSelector(state => state.userLogin)
     const [userId, setUserId] = useState('');
-    const [input, setInput] = useState('');
     const [albums, setAlbums] = useState([]);
     const [photos, setPhotos] = useState([]);
     let albumsIdArr = [];
@@ -22,11 +22,11 @@ const AlbumsList = () => {
 
         const userId = userInfo?.id;
         const fetchPhotos = async () => {
-        const albumsResponse = await axios.get( userId ? `https://jsonplaceholder.typicode.com/albums?userId=${userId}` : `https://jsonplaceholder.typicode.com/albums`);
+        const albumsResponse = await albumsAPI.get(`?userId=${userId}`);
         //setAlbums(albumsResponse.data);
         albumsIdArr = albumsResponse.data.map(({id}) => `albumId=${id}`);
 
-        const photosResponse = await axios.get( albumsIdArr.length > 0 ? `https://jsonplaceholder.typicode.com/photos?${albumsIdArr.join('&')}` : `https://jsonplaceholder.typicode.com/photos?_limit=10`);
+        const photosResponse = await photosAPI.get( albumsIdArr.length > 0 && `?${albumsIdArr.join('&')}`);
         setPhotos(photosResponse.data)
 
         console.log(albumsIdArr);
@@ -43,17 +43,6 @@ const AlbumsList = () => {
             <h2>AlbumsList</h2>
             <h3> { userInfo?.name ? `Current user is ${userInfo.name}`   : "The user is not authorized. Please,log in" }</h3>
             <div>
-                {/* <input
-                  onChange = {(e) => setInput(e.target.value)}  
-                  value={input}
-                ></input>
-                <button
-                onClick={() => {
-                    setUserId(input);
-                    setInput('');
-                    }
-                }
-                >Set User</button> */}
             </div>
             { userId && <h4>User id is {userId}</h4>}
             <ul>
