@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import axios from 'axios';
+import photosAPI from '../../Api/photosAPI';
 
 const AlbumDetailPage = () => {
     const [photos, setPhotos] = useState([]);
@@ -11,7 +11,7 @@ const AlbumDetailPage = () => {
     useEffect( () => {
 
         const fetchPhotos = async () => {
-            const photosResponse = await axios.get(`https://jsonplaceholder.typicode.com/photos?albumId=${albumId}`);
+            const photosResponse = await photosAPI.get(`?albumId=${albumId}`);
             console.log(photosResponse.data)
             setPhotos(photosResponse.data)
             
@@ -26,7 +26,7 @@ const AlbumDetailPage = () => {
                     <div key={id}>
                         <div className="album__link">Id: {id}, Album id: {albumId},</div> 
                         <div><b>title: </b>{title} </div>
-                        <img src={url}></img>
+                        <img src={url} alt={title}></img>
                         <hr/>
                     </div>
                 ))}

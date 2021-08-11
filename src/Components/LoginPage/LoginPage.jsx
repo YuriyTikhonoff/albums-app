@@ -5,10 +5,9 @@ import { useFormik } from "formik";
 import { useHistory } from 'react-router-dom';
 import * as Yup from "yup";
 
-import { login } from '../../Redux/Actions/userActions'
-
-import Error from "../shared/Error/Error";
-import { checkCredentials } from '../../API/usersAPI';
+import { login } from '../../Store/Actions/userActions'
+import Error from "../Shared/Error/Error";
+import { checkCredentials } from '../../Api/usersAPI';
 
 const LoginPage = () => {
   const [ failedAuth, setFailedAuth ] = useState(false)

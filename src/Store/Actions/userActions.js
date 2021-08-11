@@ -1,4 +1,4 @@
-import { checkCredentials } from "../../API/usersAPI";
+import { checkCredentials } from "../../Api/usersAPI";
 
 import {
   USER_LOGIN_REQUEST,

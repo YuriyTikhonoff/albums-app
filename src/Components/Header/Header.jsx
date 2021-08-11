@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react'
-import './Header.scss'
 import { useDispatch, useSelector  } from 'react-redux'
-import { logout } from '../../Redux/Actions/userActions'
+import { logout } from '../../Store/Actions/userActions'
 import { useHistory } from 'react-router-dom'
 
+import './Header.scss'
 
 const Header = () => {
     const dispatch = useDispatch();

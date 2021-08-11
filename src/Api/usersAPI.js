@@ -14,7 +14,6 @@ export const checkCredentials = async ({ login }) => {
     const { data: users } = await usersAPI.get();
 
     const emailsArr = users.map(({ email }) => email);
-
     const userNamesArr = users.map(({ username }) => username);
 
     console.log(emailsArr);

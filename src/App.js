@@ -25,7 +25,7 @@ function App() {
         <Route path="/login" component={LoginPage} exact />
         <Route path="/albums" component={AlbumsList} exact />
         <Route path="/albums/:albumId" component={AlbumDetailPage} exact />
-        <Redirect to="/albums" />
+        <Redirect to="/login" />
       </div>
     </Router>
   );
