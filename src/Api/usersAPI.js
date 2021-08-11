@@ -12,12 +12,8 @@ export const checkCredentials = async ({ login }) => {
     login = login.trim();
 
     const { data: users } = await usersAPI.get();
-
     const emailsArr = users.map(({ email }) => email);
     const userNamesArr = users.map(({ username }) => username);
-
-    console.log(emailsArr);
-    console.log(userNamesArr);
 
     const isAuthorised =
       emailsArr.includes(login) || userNamesArr.includes(login);

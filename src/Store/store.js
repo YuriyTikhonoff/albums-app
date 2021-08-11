@@ -10,16 +10,10 @@ const reducer = combineReducers({
   userLogin: userLoginReducer,
 });
 
-const initialState = {
-  albumList: [{}],
-  userLogin: {},
-};
-
 const middleware = [thunk];
 
 const store = createStore(
   reducer,
-  initialState,
   composeWithDevTools(applyMiddleware(...middleware))
 );
 

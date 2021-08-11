@@ -2,16 +2,25 @@ import {
   ALBUM_LIST_REQUEST,
   ALBUM_LIST_SUCCESS,
   ALBUM_LIST_FAIL,
+  ALBUM_LIST_CLEANUP,
 } from "../Constants/albumConstants";
 
-export const albumListReducer = (state = { products: [] }, action) => {
+const initialState = {
+  loading: false,
+  error: null,
+  albums: [],
+};
+
+export const albumListReducer = (state = initialState, action) => {
   switch (action.type) {
     case ALBUM_LIST_REQUEST:
-      return { loading: true, albumList: [] };
+      return { ...state, loading: true };
     case ALBUM_LIST_SUCCESS:
-      return { loading: false, albumList: action.payload };
+      return { ...state, loading: false, albums: action.payload };
     case ALBUM_LIST_FAIL:
-      return { loading: false, error: action.payload };
+      return { ...state, loading: false, error: action.payload };
+    case ALBUM_LIST_CLEANUP:
+      return { ...initialState };
     default:
       return state;
   }

@@ -7,7 +7,7 @@ import {
   USER_LOGOUT,
 } from "../Constants/userConstants.js";
 
-export const login = (values) => async (dispatch) => {
+export const logIn = (values) => async (dispatch) => {
   try {
     dispatch({
       type: USER_LOGIN_REQUEST,
@@ -30,7 +30,7 @@ export const login = (values) => async (dispatch) => {
   }
 };
 
-export const logout = () => (dispatch) => {
+export const logOut = () => (dispatch) => {
   dispatch({
     type: USER_LOGOUT,
   });

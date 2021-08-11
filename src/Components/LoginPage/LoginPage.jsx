@@ -1,18 +1,22 @@
 import React, { useState} from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import './LoginPage.scss'
+import { useDispatch } from 'react-redux'
 import { useFormik } from "formik";
 import { useHistory } from 'react-router-dom';
 import * as Yup from "yup";
 
-import { login } from '../../Store/Actions/userActions'
+import { logIn } from '../../Store/Actions/userActions'
+import { fetchAlbums } from '../../Store/Actions/albumActions';
 import Error from "../Shared/Error/Error";
 import { checkCredentials } from '../../Api/usersAPI';
+import Loader from '../Shared/Loader/Loader';
+
+import './LoginPage.scss';
 
 const LoginPage = () => {
-  const [ failedAuth, setFailedAuth ] = useState(false)
+  const [ failedAuth, setFailedAuth ] = useState(false);
+  const [ isLoading, setIsLoading ] = useState(false);
   const history = useHistory();
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
     const validationSchema = Yup.object({
         login: Yup.string()
@@ -22,18 +26,25 @@ const LoginPage = () => {
       });
 
       const sumbitHandler = async (values) => {
-        
+        setIsLoading(true);
         const loggedInUser  = await checkCredentials(values)
-        console.log('isAuthorised is ', loggedInUser)
 
-        dispatch(login(values))
-        
         if (loggedInUser) { 
-          history.push('/albums')
+          try {
+            dispatch(logIn(values))
+            dispatch(fetchAlbums(loggedInUser.id))
+          } catch(error){
+            console.log(error)
+          } finally {
+            setTimeout(() => history.push('/albums') , 1000)
+            
+          }
         } else {
           setFailedAuth(true);
           setTimeout(() => setFailedAuth(false) , 3000)
         }
+        setIsLoading(false);
+
       }
 
       const formik = useFormik({
@@ -49,6 +60,7 @@ const LoginPage = () => {
 
     return (
         <div>
+          {isLoading && <Loader />}
           <form onSubmit={formik.handleSubmit} className="login__form">
             { failedAuth ? <Error errorMessage="Credentials are wrong. Try again."/> : <br/>}
             <h2 className="login__form__title">Login page</h2>
@@ -92,7 +104,7 @@ const LoginPage = () => {
       </button>
     </form>
 
-        </div>
+    </div>
     )
 }
 

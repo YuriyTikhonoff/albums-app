@@ -7,4 +7,11 @@ const albumsAPI = axios.create({
   responseType: "json",
 });
 
+export const getAlbumsOfUser = async (userId) => {
+  const { data: albums } = await albumsAPI.get("", {
+    params: { userId },
+  });
+  return albums;
+};
+
 export default albumsAPI;

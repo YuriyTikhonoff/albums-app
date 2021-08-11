@@ -1,102 +1,103 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { useSelector } from 'react-redux'
+import React, { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
-import photosAPI from '../../Api/photosAPI'
-import albumsAPI from '../../Api/albumsAPI'
-import {getPageCount} from '../../Utils/pages'
+import photosAPI from '../../Api/photosAPI';
+import { getPageCount } from '../../Utils/pages';
+import { getUrlParamsFromArr } from '../../Utils/urlParams';
+import { getIdTitleAlbumsMap } from '../../Utils/maps'; 
 import Loader from '../Shared/Loader/Loader';
-import { useObserver } from '../../Hooks/useObserver'
+import Error from '../Shared/Error/Error';
 
-import './AlbumsList.scss'
+import './AlbumsList.scss';
 
 const AlbumsList = () => {
-    const { userInfo } = useSelector(state => state.userLogin)
-    const [userId, setUserId] = useState('');
-    const [albums, setAlbums] = useState([]);
-    const [totalPages, setTotalPages] = useState(0)
-    const [limitPhotos, setLimitPhotos] = useState(6)
-    const [page, setPage] = useState(1)
+    const { userInfo } = useSelector(state => state.userLogin);
+    const { albums } = useSelector(state => state.albumList);
+    const [totalPages, setTotalPages] = useState(0);
+    const [limitPhotos] = useState(6);
+    const [page, setPage] = useState(1);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
     const [photos, setPhotos] = useState([]);
+    const [fetching, setFetching] = useState(true);
 
-    const lastElement = useRef();
     const history = useHistory();
-   
-    //useEffect(() => setUserId(userInfo?.id), [userInfo]) 
-    const fetchPhotos = async () => {
-        const albumsResponse = await albumsAPI.get(`?userId=${userId}`);
-        let albumsIdArr = albumsResponse.data.map(({id}) => `albumId=${id}`);
+    const idTitleAlbumsMap = getIdTitleAlbumsMap(albums);
 
-        const photosResponse = await photosAPI.get( albumsIdArr.length > 0 && `?${albumsIdArr.join('&')}`,
+    const scrollHandler = (e) => {
+        const { scrollHeight, scrollTop } = e.target.documentElement;
+        const { innerHeight: windowInnerHeight } = window;
+        const isPageBottom = (scrollHeight - (scrollTop + windowInnerHeight)) < 0.5;
+        if ((isPageBottom) && ((page < totalPages) || (totalPages === 0))) {
+            setFetching(true);
+        }
+    }
+
+    const fetchPhotos = async () => {
+        setIsLoading(true)
+        const photosResponse = await photosAPI.get(getUrlParamsFromArr(albums.map(el => el.id), 'albumId'),
             {
                 params: { _limit: limitPhotos, _page: page }
             }
         );
-       
-        console.log('x-total-count ', photosResponse.headers['x-total-count'] )
-        const totalCount = photosResponse.headers['x-total-count']
-        setTotalPages(getPageCount(totalCount, limitPhotos))    
 
-        setPhotos([...photos, ...photosResponse.data])
-
-        console.log(albumsIdArr);
+        const totalCount = photosResponse.headers['x-total-count'];
+        setTotalPages(getPageCount(totalCount, limitPhotos));
+        setPhotos([...photos, ...photosResponse.data]);
+        setIsLoading(false);
     }
 
-    useEffect( () => {
-        const userId = userInfo?.id;
-
-
-
-        if (userInfo )  {
-            try {
-                setIsLoading(true)
-                fetchPhotos()
-            } catch(error) {
-                setError(error)
-            } finally {
-                setIsLoading(false)
-            }
-        } else {
-            setPhotos([])
-        }
-       
-        console.log(lastElement.current)
-    }, [userInfo, userId])
-
-
-    
-    useObserver(lastElement, page < totalPages , isLoading, () => setPage(page + 1));
+    useEffect(() => {
+        document.addEventListener('scroll', scrollHandler);
+        return () => document.removeEventListener('scroll', scrollHandler);
+    }, [])
 
     useEffect(() => {
-        console.log(`Fetch new batch of photos`)
-    }, [page])
+        if (fetching) {
+            try {
+                fetchPhotos();
+                setPage(page + 1);
+            } catch (error) {
+                setError(error);
+            } finally {
+                setFetching(false);
+            }
+        }
+
+        return () => {
+            setFetching(false);
+        }
+    }, [fetching])
+
 
 
     return (
         <div>
+            { error && <Error errorMessage={error}/>}
             <h2>AlbumsList</h2>
-            <h3> { userInfo?.name ? `Current user is ${userInfo.name}`   : "The user is not authorized. Please,log in" }</h3>
-            <div>
-            </div>
-            { userId && <h4>User id is {userId}</h4>}
-            { isLoading && <Loader/>}
-            <ul>
-                {photos.map(({id, albumId, title, thumbnailUrl}) => (
-                    <div key={id}>
-                        <div className="album__link"
-                        onClick={() => history.push(`/albums/${albumId}`)}
-                        >Id: {id}, Album id: {albumId},</div> 
-                        <div><b>title: </b>{title} </div>
-                        <img src={thumbnailUrl} alt="thumbnail"></img>
-                        <hr/>
-                    </div>
-                ))}
-                <h4>Current page is {page} from {totalPages}</h4>
-                <button onClick={() => setPage(page + 1)}>More</button>
-                <div className="observable-item" ref={lastElement} >sdsdsd3</div> 
-            </ul>
+            {userInfo
+                ?
+                <div>
+                    {isLoading && <Loader />}
+                    <ul>
+                        {photos.map(({ id, albumId, title, thumbnailUrl }) => (
+                            <div key={id}>
+                                <div className="album__btn"
+                                    onClick={() => history.push(`/albums/${albumId}`)}
+                                >
+                                Watch full album "{idTitleAlbumsMap[albumId]}"
+                                </div>
+                                <div className="album__title"><b>Photo: </b>{title} </div>
+                                <img src={thumbnailUrl} alt="thumbnail"></img>
+                                <hr />
+                            </div>
+                        ))}
+                    </ul>
+                </div>
+
+                :
+                <h3>The user is not authorized.<br/> Please,log in </h3>}
         </div>
     )
 }

@@ -1,10 +1,32 @@
 .album{
-    &__link {
+    &__btn {
         cursor: pointer;
+        border: 1px #ccc solid;
+        border-radius: 5px;
+        display: inline-block;
+        padding: 5px 10px;
+        cursor: pointer;
+        color: rgb(44, 44, 44);
+        background-color: #e6e6e6;
+        &:hover{
+            background-color: #dbdbdb;
+        }
+    }
+    &__title{
+        margin: 5px 0;
     }
 }
 
-.observable-item{
-    height: 20px;
-    width: 1px;
+a {
+    text-decoration: none;
+}
+
+ul {
+    padding: 0;
+    margin: 0;
+}
+
+li {
+    padding: 0;
+    margin: 0;
 }
