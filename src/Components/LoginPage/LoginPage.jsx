@@ -97,6 +97,7 @@ const LoginPage = () => {
         )}
       </div>
       <button 
+      disabled
       className="input__item__btn"
       type="submit" 
       >
